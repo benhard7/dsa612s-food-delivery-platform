@@ -1,0 +1,7 @@
+[package]
+org = "fooddelivery"
+name = "admin_service"
+version = "0.1.0"
+
+[build-options]
+observabilityIncluded = false
