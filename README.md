@@ -31,3 +31,5 @@ _Diagram to be added in `docs/architecture.png`._
 | Member | Student no. | Service(s) |
 |---|---|---|
 | | | |
+
+_Repo set up by benhard7._
