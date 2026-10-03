@@ -27,9 +27,4 @@ See [docs/events.md](docs/events.md). **Do not change topics or payloads without
 ## Architecture
 _Diagram to be added in `docs/architecture.png`._
 
-## Team
-| Member | Student no. | Service(s) |
-|---|---|---|
-| | | |
 
-_Repo set up by benhard7._
