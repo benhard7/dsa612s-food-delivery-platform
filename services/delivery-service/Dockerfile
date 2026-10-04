@@ -1,5 +1,5 @@
 # Multi-stage build for a Ballerina service
-FROM ballerina/ballerina:2201.10.0 AS build
+FROM ballerina/ballerina:2201.13.5 AS build
 USER root
 WORKDIR /app
 COPY . .
