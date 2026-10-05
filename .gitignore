@@ -6,3 +6,4 @@ Config.toml
 .idea/
 .vscode/
 *.log
+**/Dependencies.toml
