@@ -12,7 +12,7 @@ All topics: 3 partitions, replication factor 1. Timestamps are ISO-8601 UTC.
 | `payments.completed` | Payment | Order, Notification | Payment succeeded |
 | `payments.failed` | Payment | Order, Notification | Payment failed -> order CANCELLED |
 | `orders.confirmed` | Order | Restaurant, Notification | Payment received (status CONFIRMED) |
-| `orders.status.updated` | Restaurant | Order | Kitchen sets PREPARING or READY |
+| `orders.status.updated` | Restaurant | Order | Kitchen sets PREPARING or READY, or REJECTED (stock/unknown restaurant) |
 | `orders.ready` | Order | Delivery, Notification | Order reached READY |
 | `delivery.assigned` | Delivery | Order, Notification | Driver assigned (status OUT_FOR_DELIVERY) |
 | `delivery.completed` | Delivery | Order, Admin, Notification | Driver delivered (status DELIVERED) |
@@ -28,6 +28,7 @@ Any state before OUT_FOR_DELIVERY may go to CANCELLED.
 | `payments.completed` | CONFIRMED (then publish `orders.confirmed`) |
 | `payments.failed` | CANCELLED |
 | `orders.status.updated` (PREPARING / READY) | PREPARING / READY (on READY publish `orders.ready`) |
+| `orders.status.updated` (REJECTED) | CANCELLED (then publish `orders.cancelled`) |
 | `delivery.assigned` | OUT_FOR_DELIVERY |
 | `delivery.completed` | DELIVERED |
 
@@ -100,3 +101,4 @@ Mongo (from containers): `mongodb://mongo:27017`. From laptop: `mongodb://localh
 - 2026-10-05: Admin also consumes `orders.created` and `orders.cancelled` (needed for restaurant statistics). No payload changes.
 - 2026-10-05: Order Service implemented (REST: POST /orders, GET /orders, GET /orders/{id}, GET /orders/{id}/history, POST /orders/{id}/cancel).
 - 2026-10-05: Payment Service implemented. Consumes `orders.created` and `orders.cancelled`; payments over `PAYMENT_LIMIT` (default 5000) are declined to demo `payments.failed`; cancelling a paid order marks the payment REFUNDED and sends a `notifications.send`. REST: GET /payments, GET /payments/{id}.
+- 2026-10-05: Restaurant Service implemented. `orders.status.updated` may now carry `status: REJECTED` (plus optional `reason`) when stock is insufficient or the restaurant is unknown; Order Service cancels the order. REST: /restaurants, /restaurants/{id}/hours, /restaurants/{id}/menu, /kitchen/orders.

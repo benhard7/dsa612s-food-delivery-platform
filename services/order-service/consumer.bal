@@ -53,6 +53,9 @@ function handleEvent(string topic, OrderRef evt) returns error? {
             string? status = evt?.status;
             if status == "PREPARING" || status == "READY" {
                 _ = check moveAndPublish(id, <string>status, "kitchen update");
+            } else if status == "REJECTED" {
+                // e.g. out of stock: cancel (Payment refunds, Restaurant frees stock)
+                _ = check moveAndPublish(id, "CANCELLED", "rejected by restaurant");
             } else {
                 log:printWarn("orders.status.updated with unsupported status for " + id);
             }
