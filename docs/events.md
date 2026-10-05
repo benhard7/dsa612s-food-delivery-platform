@@ -16,7 +16,7 @@ All topics: 3 partitions, replication factor 1. Timestamps are ISO-8601 UTC.
 | `orders.ready` | Order | Delivery, Notification | Order reached READY |
 | `delivery.assigned` | Delivery | Order, Notification | Driver assigned (status OUT_FOR_DELIVERY) |
 | `delivery.completed` | Delivery | Order, Admin, Notification | Driver delivered (status DELIVERED) |
-| `orders.cancelled` | Order | Restaurant, Payment, Notification, Admin | Order cancelled |
+| `orders.cancelled` | Order | Restaurant, Payment, Notification, Admin, Delivery | Order cancelled |
 | `notifications.send` | any service | Notification | Direct alert request |
 
 ## Order state machine
@@ -102,3 +102,5 @@ Mongo (from containers): `mongodb://mongo:27017`. From laptop: `mongodb://localh
 - 2026-10-05: Order Service implemented (REST: POST /orders, GET /orders, GET /orders/{id}, GET /orders/{id}/history, POST /orders/{id}/cancel).
 - 2026-10-05: Payment Service implemented. Consumes `orders.created` and `orders.cancelled`; payments over `PAYMENT_LIMIT` (default 5000) are declined to demo `payments.failed`; cancelling a paid order marks the payment REFUNDED and sends a `notifications.send`. REST: GET /payments, GET /payments/{id}.
 - 2026-10-05: Restaurant Service implemented. `orders.status.updated` may now carry `status: REJECTED` (plus optional `reason`) when stock is insufficient or the restaurant is unknown; Order Service cancels the order. REST: /restaurants, /restaurants/{id}/hours, /restaurants/{id}/menu, /kitchen/orders.
+- 2026-10-05: Delivery Service implemented. Also consumes `orders.cancelled` (drops a PENDING/ASSIGNED delivery and frees the driver). With no free driver a delivery waits as PENDING and is assigned when a driver registers, goes AVAILABLE or finishes a job. REST: /drivers, /drivers/{id}/status, /deliveries, /deliveries/{id}/complete, /deliveries/{id}/location.
+- 2026-10-05: Notification Service implemented. Consumes `notifications.send` plus the lifecycle topics; it learns customerId/restaurantId from `orders.created` so payment and delivery events can be addressed. Customers get EMAIL/SMS/PUSH alerts, restaurants get PUSH (cancellations, driver pickup, delivery). Notifications are idempotent per (topic, order, recipient). Channels: EMAIL, SMS, PUSH; recipient types: CUSTOMER, RESTAURANT, DRIVER. REST: POST /notifications (queues a `notifications.send`), GET /notifications?orderId=&recipientId=&recipientType=&channel=&status=, GET /notifications/{id}.
