@@ -8,7 +8,7 @@ All topics: 3 partitions, replication factor 1. Timestamps are ISO-8601 UTC.
 
 | Topic | Published by | Consumed by | Trigger |
 |---|---|---|---|
-| `orders.created` | Order | Payment, Restaurant, Notification | Customer places order (status CREATED) |
+| `orders.created` | Order | Payment, Restaurant, Notification, Admin | Customer places order (status CREATED) |
 | `payments.completed` | Payment | Order, Notification | Payment succeeded |
 | `payments.failed` | Payment | Order, Notification | Payment failed -> order CANCELLED |
 | `orders.confirmed` | Order | Restaurant, Notification | Payment received (status CONFIRMED) |
@@ -16,7 +16,7 @@ All topics: 3 partitions, replication factor 1. Timestamps are ISO-8601 UTC.
 | `orders.ready` | Order | Delivery, Notification | Order reached READY |
 | `delivery.assigned` | Delivery | Order, Notification | Driver assigned (status OUT_FOR_DELIVERY) |
 | `delivery.completed` | Delivery | Order, Admin, Notification | Driver delivered (status DELIVERED) |
-| `orders.cancelled` | Order | Restaurant, Payment, Notification | Order cancelled |
+| `orders.cancelled` | Order | Restaurant, Payment, Notification, Admin | Order cancelled |
 | `notifications.send` | any service | Notification | Direct alert request |
 
 ## Order state machine
@@ -97,3 +97,6 @@ Mongo (from containers): `mongodb://mongo:27017`. From laptop: `mongodb://localh
 ## Change log
 - 2026-10-03: initial contract.
 - 2026-10-03: added Dockerfile + placeholder Ballerina project per service.
+- 2026-10-05: Admin also consumes `orders.created` and `orders.cancelled` (needed for restaurant statistics). No payload changes.
+- 2026-10-05: Order Service implemented (REST: POST /orders, GET /orders, GET /orders/{id}, GET /orders/{id}/history, POST /orders/{id}/cancel).
+- 2026-10-05: Payment Service implemented. Consumes `orders.created` and `orders.cancelled`; payments over `PAYMENT_LIMIT` (default 5000) are declined to demo `payments.failed`; cancelling a paid order marks the payment REFUNDED and sends a `notifications.send`. REST: GET /payments, GET /payments/{id}.
