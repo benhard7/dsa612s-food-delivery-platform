@@ -1,6 +1,6 @@
 # Event Contract (source of truth)
 
-**Rule:** nobody changes a topic or payload without editing this file in the same commit.
+***Rule:*** nobody changes a topic or payload without editing this file in the same commit.
 All messages are JSON. Message key = `orderId` (keeps each order's events ordered in one partition).
 All topics: 3 partitions, replication factor 1. Timestamps are ISO-8601 UTC.
 
